@@ -43,7 +43,7 @@ import (
     "errors"
     "fmt"
 
-    "github.com/hyperledger/fabric-contract-api-go/contractapi"
+    "github.com/ravengit/fabric-contract-api-go/contractapi"
 )
 
 // SimpleContract contract for handling writing and reading from the world state
@@ -158,7 +158,7 @@ import (
     "errors"
     "fmt"
 
-    "github.com/hyperledger/fabric-contract-api-go/contractapi"
+    "github.com/ravengit/fabric-contract-api-go/contractapi"
 )
 
 // SimpleContract contract for handling writing and reading from the world state
@@ -231,7 +231,7 @@ In the same folder as your `simple-contract.go` file, create a file called `main
 package main
 
 import (
-    "github.com/hyperledger/fabric-contract-api-go/contractapi"
+    "github.com/ravengit/fabric-contract-api-go/contractapi"
 )
 
 func main() {
@@ -264,7 +264,7 @@ Your `main.go` file should now look like this:
 package main
 
 import (
-    "github.com/hyperledger/fabric-contract-api-go/contractapi"
+    "github.com/ravengit/fabric-contract-api-go/contractapi"
 )
 
 func main() {

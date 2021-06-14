@@ -7,7 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	ledgerapi "github.com/hyperledger/fabric-chaincode-integration/commercialpaper/ledger-api"
+	ledgerapi "github.com/ravengit/fabric-chaincode-integration/commercialpaper/ledger-api"
 )
 
 // State enum for commercial paper state property

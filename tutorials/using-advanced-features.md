@@ -62,7 +62,7 @@ To create your function to be called before each transaction create a new file c
 package main
 
 import (
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"github.com/ravengit/fabric-contract-api-go/contractapi"
 )
 
 // CustomTransactionContext adds methods of storing and retrieving additional data for use

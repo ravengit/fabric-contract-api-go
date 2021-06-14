@@ -3,7 +3,7 @@
 
 package commercialpaper
 
-import ledgerapi "github.com/hyperledger/fabric-chaincode-integration/commercialpaper/ledger-api"
+import ledgerapi "github.com/ravengit/fabric-chaincode-integration/commercialpaper/ledger-api"
 
 // ListInterface defines functionality needed
 // to interact with the world state on behalf

@@ -9,8 +9,8 @@ import (
 	"sort"
 	"unicode"
 
-	"github.com/hyperledger/fabric-contract-api-go/internal/types"
-	"github.com/hyperledger/fabric-contract-api-go/internal/utils"
+	"github.com/ravengit/fabric-contract-api-go/internal/types"
+	"github.com/ravengit/fabric-contract-api-go/internal/utils"
 )
 
 func basicTypesAsSlice() []string {

@@ -4,7 +4,7 @@
 package commercialpaper
 
 import (
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"github.com/ravengit/fabric-contract-api-go/contractapi"
 )
 
 // TransactionContextInterface an interface to

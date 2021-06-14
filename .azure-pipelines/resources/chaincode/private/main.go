@@ -6,7 +6,7 @@ package main
 import (
 	"errors"
 
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"github.com/ravengit/fabric-contract-api-go/contractapi"
 )
 
 // PrivateContract with biz logic

@@ -7,7 +7,7 @@ import (
 	"errors"
 	"testing"
 
-	ledgerapi "github.com/hyperledger/fabric-chaincode-integration/commercialpaper/ledger-api"
+	ledgerapi "github.com/ravengit/fabric-chaincode-integration/commercialpaper/ledger-api"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

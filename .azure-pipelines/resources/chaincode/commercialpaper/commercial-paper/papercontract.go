@@ -6,7 +6,7 @@ package commercialpaper
 import (
 	"fmt"
 
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	"github.com/ravengit/fabric-contract-api-go/contractapi"
 )
 
 // Contract chaincode that defines

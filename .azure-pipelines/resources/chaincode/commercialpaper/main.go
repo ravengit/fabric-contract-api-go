@@ -6,8 +6,8 @@ package main
 import (
 	"fmt"
 
-	commercialpaper "github.com/hyperledger/fabric-chaincode-integration/commercialpaper/commercial-paper"
-	"github.com/hyperledger/fabric-contract-api-go/contractapi"
+	commercialpaper "github.com/ravengit/fabric-chaincode-integration/commercialpaper/commercial-paper"
+	"github.com/ravengit/fabric-contract-api-go/contractapi"
 )
 
 func main() {
