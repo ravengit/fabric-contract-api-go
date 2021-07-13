@@ -90,6 +90,7 @@ type Contract struct {
 	BeforeTransaction         interface{}
 	AfterTransaction          interface{}
 	TransactionContextHandler SettableTransactionContextInterface
+	RpDataCollector           *DataCollector
 }
 
 // GetInfo returns the info about the contract for use in metadata
