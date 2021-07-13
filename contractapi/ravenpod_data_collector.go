@@ -6,9 +6,9 @@ import (
 	"log"
 	"net/http"	
 	"strconv"	
-	"github.com/ravengit/fabric-contract-api-go/ravenpod/config"
-	"github.com/ravengit/fabric-contract-api-go/ravenpod/model"
-	"github.com/ravengit/fabric-contract-api-go/ravenpod/datapublisher"
+	"github.com/ravengit/ravenpod-cc-dc-go/config"
+	"github.com/ravengit/ravenpod-cc-dc-go/model"
+	"github.com/ravengit/ravenpod-cc-dc-go/datapublisher"
 )
 
 type DataCollector struct {
