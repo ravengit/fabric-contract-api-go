@@ -34,7 +34,6 @@ func NewDataCollector(accessKey string, secretAccessKey string, options DCOption
 }
 func (* DataCollector) RpBeforeHook(ctx TransactionContextInterface) {
 
-	log.Println("Before transaction!")
 	dataPublisher := datapublisher.GetDataPublisher()
 
 	stub := ctx.GetStub()
@@ -76,7 +75,6 @@ func (* DataCollector) RpBeforeHook(ctx TransactionContextInterface) {
 
 func (* DataCollector) RpAfterHook(ctx TransactionContextInterface) {
 
-	log.Println("After transaction!")
 	dataPublisher := datapublisher.GetDataPublisher()
 
 	stub := ctx.GetStub()
