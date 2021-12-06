@@ -17,6 +17,7 @@ import (
 	"github.com/cucumber/godog"
 	"github.com/cucumber/godog/colors"
 	"github.com/cucumber/godog/gherkin"
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/ravengit/fabric-chaincode-go/shimtest"
 	"github.com/ravengit/fabric-contract-api-go/contractapi"
 	"github.com/ravengit/fabric-contract-api-go/internal/functionaltests/contracts/complexcontract"
@@ -24,7 +25,6 @@ import (
 	"github.com/ravengit/fabric-contract-api-go/internal/functionaltests/contracts/simplecontract"
 	"github.com/ravengit/fabric-contract-api-go/internal/functionaltests/contracts/utils"
 	"github.com/ravengit/fabric-contract-api-go/metadata"
-	"github.com/ravengit/fabric-protos-go/peer"
 )
 
 var opt = godog.Options{Output: colors.Colored(os.Stdout)}

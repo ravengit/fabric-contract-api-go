@@ -11,13 +11,13 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/hyperledger/fabric-protos-go/peer"
 	"github.com/ravengit/fabric-chaincode-go/pkg/cid"
 	"github.com/ravengit/fabric-chaincode-go/shim"
 	"github.com/ravengit/fabric-contract-api-go/internal"
 	"github.com/ravengit/fabric-contract-api-go/internal/utils"
 	"github.com/ravengit/fabric-contract-api-go/metadata"
 	"github.com/ravengit/fabric-contract-api-go/serializer"
-	"github.com/ravengit/fabric-protos-go/peer"
 )
 
 type contractChaincodeContract struct {

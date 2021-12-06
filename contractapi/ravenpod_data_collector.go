@@ -1,39 +1,52 @@
 package contractapi
 
 import (
-	"os"
-	"encoding/json"	
-	"log"
-	"net/http"	
-	"strconv"	
-    guuid "github.com/google/uuid"
+	"encoding/json"
+	guuid "github.com/google/uuid"
 	"github.com/ravengit/ravenpod-cc-dc-go/config"
-	"github.com/ravengit/ravenpod-cc-dc-go/model"
 	"github.com/ravengit/ravenpod-cc-dc-go/datapublisher"
+	"github.com/ravengit/ravenpod-cc-dc-go/model"
+	"github.com/ravengit/ravenpod-cc-dc-go/runtime"
+	"log"
+	"net/http"
+	"os"
+	"strconv"
 )
 
 type DataCollector struct {
-	AccessKey string
-	SecretAccessKey string
-	DataPipelineRegion string
-	DataPipelineAccessKey string
+	AccessKey                   string
+	SecretAccessKey             string
+	DataPipelineRegion          string
+	DataPipelineAccessKey       string
 	DataPipelineSecretAccessKey string
 }
 
 type DCOptions struct {
-	Debug bool 
+	Debug                  bool
+	HashTrackingFunc       func(collection string, key string, data []byte) (string, string)
+	DisableParam           bool
+	DisableParamExceptions []string
 }
+
+var (
+	dataCollector *DataCollector // singleton
+)
 
 func NewDataCollector(accessKey string, secretAccessKey string, options DCOptions) *DataCollector {
 	log.Println("[RAVENPOD] Initializing data collector")
-	dc := DataCollector{AccessKey: accessKey, SecretAccessKey: secretAccessKey}
-	getDataPipelineAccessKey(&dc)
-	datapublisher.InitDataPublisher(dc.DataPipelineRegion, dc.DataPipelineAccessKey, dc.DataPipelineSecretAccessKey)
-
+	dataCollector = &DataCollector{AccessKey: accessKey, SecretAccessKey: secretAccessKey}
+	getDataPipelineAccessKey(dataCollector)
+	datapublisher.InitDataPublisher(dataCollector.DataPipelineRegion, dataCollector.DataPipelineAccessKey, dataCollector.DataPipelineSecretAccessKey)
+	runtime.SetRuntimeOptions(options.Debug, options.HashTrackingFunc, options.DisableParam, options.DisableParamExceptions)
 	log.Println("[RAVENPOD] Finished initializing data collector")
-    return &dc
+	return dataCollector
 }
-func (* DataCollector) RpBeforeHook(ctx TransactionContextInterface) {
+
+// func GetDataCollector() *DataCollector {
+// 	return dataCollector
+// }
+
+func (*DataCollector) RpBeforeHook(ctx TransactionContextInterface) {
 
 	dataPublisher := datapublisher.GetDataPublisher()
 
@@ -46,22 +59,40 @@ func (* DataCollector) RpBeforeHook(ctx TransactionContextInterface) {
 
 	hasRavenpodData := transientMap["rp_webTxnId"]
 	if len(hasRavenpodData) > 0 {
-		webTxnId := string( transientMap["rp_webTxnId"] )
-		ravenpodTxnId := string( transientMap["rp_ravenpodTxnId"] )
+		webTxnId := string(transientMap["rp_webTxnId"])
+		ravenpodTxnId := string(transientMap["rp_ravenpodTxnId"])
 		blockchainTxnId := stub.GetTxID()
 		invocationId := guuid.New().String()
-		accountId := string( transientMap["rp_accountId"] )
+		accountId := string(transientMap["rp_accountId"])
 		channel := stub.GetChannelID()
-		moduleName :=  os.Getenv("CORE_CHAINCODE_ID_NAME")	
+		moduleName := os.Getenv("CORE_CHAINCODE_ID_NAME")
 		funcName, args := stub.GetFunctionAndParameters()
-		sequenceNumber := 0;
-		nestLevel := 0;
-		log.Println("[RAVENPOD] Before txn hook triggered.", webTxnId, ravenpodTxnId, blockchainTxnId, accountId, channel, moduleName, funcName, args)
-		argsInBytes, _ := json.Marshal(args) 
-		entryEvent := model.NewTraceRecord(accountId, webTxnId, ravenpodTxnId, blockchainTxnId, invocationId, channel, false, sequenceNumber, nestLevel, moduleName, funcName, string(argsInBytes), "", "", "", model.EVENT_TYPE_ENTRY, "")
+		sequenceNumber := 0
+		nestLevel := 0
+		log.Println("[RAVENPOD] Before transaction hook triggered.", webTxnId, ravenpodTxnId, blockchainTxnId, accountId, channel, moduleName, funcName)
+		argsInBytes, _ := json.Marshal(args)
+		entryEvent := model.NewTraceRecord(
+			accountId,
+			webTxnId,
+			ravenpodTxnId,
+			blockchainTxnId,
+			invocationId,
+			channel,
+			false,
+			sequenceNumber,
+			nestLevel,
+			moduleName,
+			funcName,
+			string(argsInBytes),
+			"",
+			"",
+			"",
+			model.EVENT_TYPE_ENTRY,
+			"",
+		)
 		dataPublisher.PushRecord(entryEvent, accountId)
-		nestLevel++;
-		sequenceNumber++;
+		nestLevel++
+		sequenceNumber++
 		transientMap["rp_invocationId"] = []byte(invocationId)
 		transientMap["rp_channel"] = []byte(channel)
 		transientMap["rp_moduleName"] = []byte(moduleName)
@@ -76,7 +107,7 @@ func (* DataCollector) RpBeforeHook(ctx TransactionContextInterface) {
 
 }
 
-func (* DataCollector) RpAfterHook(ctx TransactionContextInterface) {
+func (*DataCollector) RpAfterHook(ctx TransactionContextInterface) {
 
 	dataPublisher := datapublisher.GetDataPublisher()
 
@@ -98,11 +129,29 @@ func (* DataCollector) RpAfterHook(ctx TransactionContextInterface) {
 		moduleName := string(transientMap["rp_moduleName"])
 		funcName := string(transientMap["rp_funcName"])
 		args := string(transientMap["rp_args"])
-		nestLevel, _ := strconv.Atoi( string(transientMap["rp_nestLevel"]) )
-		sequenceNumber, _ := strconv.Atoi( string(transientMap["rp_sequenceNumber"]) )
+		nestLevel, _ := strconv.Atoi(string(transientMap["rp_nestLevel"]))
+		sequenceNumber, _ := strconv.Atoi(string(transientMap["rp_sequenceNumber"]))
 		nestLevel--
-		log.Println("[RAVENPOD] After txn hook triggered.", webTxnId, ravenpodTxnId, blockchainTxnId, accountId, channel, moduleName, funcName, args)
-		exitEvent := model.NewTraceRecord(accountId, webTxnId, ravenpodTxnId, blockchainTxnId, invocationId, channel, false, sequenceNumber, nestLevel, moduleName, funcName, args, "", "", "", model.EVENT_TYPE_EXIT, "");
+		log.Println("[RAVENPOD] After txn hook triggered.", webTxnId, ravenpodTxnId, blockchainTxnId, accountId, channel, moduleName, funcName)
+		exitEvent := model.NewTraceRecord(
+			accountId,
+			webTxnId,
+			ravenpodTxnId,
+			blockchainTxnId,
+			invocationId,
+			channel,
+			false,
+			sequenceNumber,
+			nestLevel,
+			moduleName,
+			funcName,
+			args,
+			"",
+			"",
+			"",
+			model.EVENT_TYPE_EXIT,
+			"",
+		)
 		dataPublisher.PushRecord(exitEvent, accountId)
 	} else {
 		log.Println("[RAVENPOD] Ravenpod context data not found. Did you enable Ravenpod data collector in the web app?")
@@ -111,7 +160,7 @@ func (* DataCollector) RpAfterHook(ctx TransactionContextInterface) {
 
 }
 
-func getDataPipelineAccessKey(dc * DataCollector) {
+func getDataPipelineAccessKey(dc *DataCollector) {
 
 	req, _ := http.NewRequest("GET", config.API_GET_DATA_PIPELINE_ACCESS, nil)
 
@@ -120,16 +169,16 @@ func getDataPipelineAccessKey(dc * DataCollector) {
 	q.Add("secretAccessKey", dc.SecretAccessKey)
 	req.URL.RawQuery = q.Encode()
 
-	log.Println("[RAVENPOD] Data pipeline access key request", req.URL.String())
+	log.Println("[RAVENPOD] Data pipeline access key request URL", req.URL.String())
 
-    resp, err := http.Get(req.URL.String())
-    if err != nil {
-        panic(err)
-    }
-    defer resp.Body.Close()
+	resp, err := http.Get(req.URL.String())
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 
-    log.Println("[RAVENPOD] Data pipeline access key response status:", resp.Status)	
-	
+	log.Println("[RAVENPOD] Data pipeline access key response status:", resp.Status)
+
 	var cResp model.DataPipelineAccessResponse
 	if err := json.NewDecoder(resp.Body).Decode(&cResp); err != nil {
 		log.Fatal("[RAVENPOD] Error when obtaining data pipeline access keys.")
